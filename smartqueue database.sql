@@ -1,5 +1,6 @@
 create database smart_queue_db;
 show databases;
+use smart_queue_db;
 
 create table users(id bigint primary key auto_increment, name varchar(100) not null, email varchar(50) not null unique,
 password varchar(255) not null, phone varchar(10), role varchar(20) not null default 'user',
@@ -24,3 +25,19 @@ priority VARCHAR(30) NOT NULL DEFAULT 'NORMAL', status VARCHAR(30) NOT NULL DEFA
 check_in_time DATETIME, called_at DATETIME, completed_at DATETIME,
 CONSTRAINT fk_queue_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id));
 
+CREATE TABLE consultations (id BIGINT PRIMARY KEY AUTO_INCREMENT, appointment_id BIGINT NOT NULL UNIQUE,
+doctor_id BIGINT NOT NULL, notes TEXT, diagnosis VARCHAR(500), start_time DATETIME, end_time DATETIME,
+status VARCHAR(30) NOT NULL DEFAULT 'IN_PROGRESS',
+CONSTRAINT fk_consultation_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id),
+CONSTRAINT fk_consultation_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id));
+
+CREATE TABLE feedback (id BIGINT PRIMARY KEY AUTO_INCREMENT, appointment_id BIGINT NOT NULL UNIQUE,
+user_id BIGINT NOT NULL, rating INT NOT NULL, comment VARCHAR(500), created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+CONSTRAINT chk_feedback_rating CHECK (rating BETWEEN 1 AND 5),
+CONSTRAINT fk_feedback_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id),
+CONSTRAINT fk_feedback_user FOREIGN KEY (user_id) REFERENCES users(id));
+
+CREATE TABLE notifications (id BIGINT PRIMARY KEY AUTO_INCREMENT, user_id BIGINT NOT NULL, title VARCHAR(150) NOT NULL,
+message VARCHAR(500) NOT NULL, type VARCHAR(50), is_read BOOLEAN NOT NULL DEFAULT FALSE,
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);
