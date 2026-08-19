@@ -1,27 +1,29 @@
-package com.example.smartqueue.dto;
+package com.example.smartqueue.controller;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import com.example.smartqueue.dto.UserRequest;
+import com.example.smartqueue.entity.User;
+import com.example.smartqueue.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Getter
-@Setter
-public class UserRequest {
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
 
-    @NotBlank(message = "Name is required")
-    @Size(max = 100, message = "Name cannot exceed 100 characters")
-    private String name;
+    private final UserService userService;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Enter a valid email")
-    private String email;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must contain at least 6 characters")
-    private String password;
+    @PostMapping
+    public ResponseEntity<User> createUser(
+            @Valid @RequestBody UserRequest request) {
 
-    @Size(max = 15, message = "Phone number cannot exceed 15 characters")
-    private String phone;
+        User user = userService.createUser(request);
+
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
 }
