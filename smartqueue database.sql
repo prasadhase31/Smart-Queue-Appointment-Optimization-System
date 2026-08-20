@@ -44,3 +44,5 @@ CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES users(id) ON DE
 
 show tables;
 DESCRIBE users;
+
+select * from users;
