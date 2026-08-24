@@ -2,6 +2,7 @@ package com.example.smartqueue.service;
 
 import com.example.smartqueue.dto.UserRequest;
 import com.example.smartqueue.entity.User;
+import com.example.smartqueue.exception.ResourceNotFoundException;
 import com.example.smartqueue.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -36,14 +37,17 @@ public class UserService {
     public User getUserById(Long id) {
 
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with id: " + id
+                        ));
     }
 
     public void deleteUser(Long id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "User not found with id: " + id
                         ));
 
