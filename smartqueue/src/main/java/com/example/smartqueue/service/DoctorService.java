@@ -4,6 +4,7 @@ import com.example.smartqueue.dto.DoctorRequest;
 import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import java.time.LocalDateTime;
 
@@ -30,5 +31,10 @@ public class DoctorService {
         doctor.setCreatedAt(LocalDateTime.now());
 
         return doctorRepository.save(doctor);
+    }
+
+    public List<Doctor> getAllDoctors() {
+
+        return doctorRepository.findAll();
     }
 }
