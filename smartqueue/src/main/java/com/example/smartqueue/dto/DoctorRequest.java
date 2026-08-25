@@ -21,7 +21,7 @@ public class DoctorRequest {
     @Email(message = "Enter a valid email")
     private String email;
 
-    @Size(max = 15, message = "Phone number cannot exceed 15 characters")
+    @Size(max = 15, message  = "Phone number cannot exceed 15 characters")
     private String phone;
 
     @NotBlank(message = "Specialization is required")
