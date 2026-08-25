@@ -1,0 +1,29 @@
+package com.example.smartqueue.controller;
+
+import com.example.smartqueue.dto.DoctorRequest;
+import com.example.smartqueue.entity.Doctor;
+import com.example.smartqueue.service.DoctorService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/doctors")
+public class DoctorController {
+
+    private final DoctorService doctorService;
+
+    public DoctorController(DoctorService doctorService) {
+        this.doctorService = doctorService;
+    }
+
+    @PostMapping
+    public ResponseEntity<Doctor> createDoctor(
+            @Valid @RequestBody DoctorRequest request) {
+
+        Doctor doctor = doctorService.createDoctor(request);
+
+        return new ResponseEntity<>(doctor, HttpStatus.CREATED);
+    }
+}
