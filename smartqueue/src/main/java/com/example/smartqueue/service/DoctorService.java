@@ -5,6 +5,7 @@ import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.example.smartqueue.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 
@@ -36,5 +37,14 @@ public class DoctorService {
     public List<Doctor> getAllDoctors() {
 
         return doctorRepository.findAll();
+    }
+
+    public Doctor getDoctorById(Long id) {
+
+        return doctorRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Doctor not found with id: " + id
+                        ));
     }
 }
