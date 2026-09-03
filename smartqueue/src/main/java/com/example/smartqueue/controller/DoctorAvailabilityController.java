@@ -19,7 +19,7 @@ public class DoctorAvailabilityController {
         this.doctorAvailabilityService = doctorAvailabilityService;
     }
 
-   
+
     @PostMapping
     public ResponseEntity<DoctorAvailability> createAvailability(
             @RequestBody DoctorAvailability availability) {
@@ -39,6 +39,19 @@ public class DoctorAvailabilityController {
 
         List<DoctorAvailability> availabilityList =
                 doctorAvailabilityService.getAllAvailability();
+
+        return new ResponseEntity<>(
+                availabilityList,
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<List<DoctorAvailability>> getAvailabilityByDoctorId(
+            @PathVariable Long doctorId) {
+
+        List<DoctorAvailability> availabilityList =
+                doctorAvailabilityService.getAvailabilityByDoctorId(doctorId);
 
         return new ResponseEntity<>(
                 availabilityList,
