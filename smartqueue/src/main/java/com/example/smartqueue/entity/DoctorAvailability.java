@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
@@ -23,6 +24,9 @@ public class DoctorAvailability {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
+    @Column(name = "available_date", nullable = false)
+    private LocalDate availableDate;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week", nullable = false)
     private DayOfWeek dayOfWeek;
