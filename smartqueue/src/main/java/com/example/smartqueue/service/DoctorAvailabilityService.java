@@ -24,4 +24,8 @@ public class DoctorAvailabilityService {
     public List<DoctorAvailability> getAllAvailability() {
         return doctorAvailabilityRepository.findAll();
     }
+
+    public List<DoctorAvailability> getAvailabilityByDoctorId(Long doctorId) {
+        return doctorAvailabilityRepository.findByDoctorId(doctorId);
+    }
 }

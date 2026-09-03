@@ -26,7 +26,7 @@ public class DoctorAvailability {
 
     @Column(name = "available_date", nullable = false)
     private LocalDate availableDate;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week", nullable = false)
     private DayOfWeek dayOfWeek;
