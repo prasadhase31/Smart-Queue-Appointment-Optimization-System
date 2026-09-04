@@ -46,3 +46,5 @@ show tables;
 DESCRIBE users;
 
 select * from users;
+select * from doctors;
+select * from doctor_availability;
