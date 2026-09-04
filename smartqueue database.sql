@@ -48,3 +48,14 @@ DESCRIBE users;
 select * from users;
 select * from doctors;
 select * from doctor_availability;
+
+ALTER TABLE appointments
+DROP FOREIGN KEY fk_appointment_user;
+
+ALTER TABLE appointments
+DROP COLUMN user_id;
+
+DESCRIBE appointments;
+SELECT id, name, email, role FROM users;
+
+select * from appointments;
