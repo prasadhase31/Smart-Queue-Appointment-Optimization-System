@@ -72,4 +72,15 @@ public class DoctorAvailabilityController {
                 HttpStatus.OK
         );
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteAvailability(
+            @PathVariable Long id) {
+
+        doctorAvailabilityService.deleteAvailability(id);
+
+        return ResponseEntity.ok(
+                "Doctor availability deleted successfully"
+        );
+    }
 }

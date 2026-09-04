@@ -52,4 +52,7 @@ public class DoctorAvailabilityService {
 
         return doctorAvailabilityRepository.save(existingAvailability);
     }
+
+    public void deleteAvailability(Long id) {
+    }
 }
