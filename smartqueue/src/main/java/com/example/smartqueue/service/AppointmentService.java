@@ -1,8 +1,14 @@
 package com.example.smartqueue.service;
 
 import com.example.smartqueue.entity.Appointment;
+import com.example.smartqueue.entity.Doctor;
+import com.example.smartqueue.entity.DoctorAvailability;
+import com.example.smartqueue.entity.User;
 import com.example.smartqueue.repository.AppointmentRepository;
 import org.springframework.stereotype.Service;
+import com.example.smartqueue.repository.UserRepository;
+import com.example.smartqueue.repository.DoctorRepository;
+import com.example.smartqueue.repository.DoctorAvailabilityRepository;
 
 import java.util.List;
 
@@ -10,13 +16,54 @@ import java.util.List;
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
+    private final UserRepository userRepository;
+    private final DoctorRepository doctorRepository;
+    private final DoctorAvailabilityRepository doctorAvailabilityRepository;
 
-    public AppointmentService(AppointmentRepository appointmentRepository) {
+    public AppointmentService(
+            AppointmentRepository appointmentRepository,
+            UserRepository userRepository,
+            DoctorRepository doctorRepository,
+            DoctorAvailabilityRepository doctorAvailabilityRepository) {
+
         this.appointmentRepository = appointmentRepository;
+        this.userRepository = userRepository;
+        this.doctorRepository = doctorRepository;
+        this.doctorAvailabilityRepository = doctorAvailabilityRepository;
     }
 
     // Create Appointment
     public Appointment createAppointment(Appointment appointment) {
+
+        User patient = userRepository.findById(
+                appointment.getPatient().getId()
+        ).orElseThrow(() ->
+                new RuntimeException("Patient not found")
+        );
+
+        Doctor doctor = doctorRepository.findById(
+                appointment.getDoctor().getId()
+        ).orElseThrow(() ->
+                new RuntimeException("Doctor not found")
+        );
+
+        DoctorAvailability availability =
+                doctorAvailabilityRepository.findById(
+                        appointment.getAvailability().getId()
+                ).orElseThrow(() ->
+                        new RuntimeException("Availability not found")
+                );
+
+        if (!availability.getDoctor().getId().equals(doctor.getId())) {
+            throw new RuntimeException(
+                    "This availability does not belong to this doctor"
+            );
+        }
+
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAvailability(availability);
+
         return appointmentRepository.save(appointment);
     }
 

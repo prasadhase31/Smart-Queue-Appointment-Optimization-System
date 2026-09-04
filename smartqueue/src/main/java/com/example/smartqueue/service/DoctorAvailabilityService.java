@@ -32,25 +32,7 @@ public class DoctorAvailabilityService {
     public DoctorAvailability updateAvailability(
             Long id,
             DoctorAvailability updatedAvailability) {
-
-        DoctorAvailability existingAvailability =
-                doctorAvailabilityRepository.findById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException("Availability not found"));
-
-        existingAvailability.setDoctor(updatedAvailability.getDoctor());
-        existingAvailability.setAvailableDate(
-                updatedAvailability.getAvailableDate());
-        existingAvailability.setDayOfWeek(
-                updatedAvailability.getDayOfWeek());
-        existingAvailability.setStartTime(
-                updatedAvailability.getStartTime());
-        existingAvailability.setEndTime(
-                updatedAvailability.getEndTime());
-        existingAvailability.setIsAvailable(
-                updatedAvailability.getIsAvailable());
-
-        return doctorAvailabilityRepository.save(existingAvailability);
+        return null;
     }
 
     public void deleteAvailability(Long id) {
