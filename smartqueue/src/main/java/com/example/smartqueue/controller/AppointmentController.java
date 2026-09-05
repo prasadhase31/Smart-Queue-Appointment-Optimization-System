@@ -44,4 +44,21 @@ public class AppointmentController {
                 HttpStatus.OK
         );
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Appointment> updateAppointment(
+            @PathVariable Long id,
+            @RequestBody Appointment appointment) {
+
+        Appointment updatedAppointment =
+                appointmentService.updateAppointment(
+                        id,
+                        appointment
+                );
+
+        return new ResponseEntity<>(
+                updatedAppointment,
+                HttpStatus.OK
+        );
+    }
 }
