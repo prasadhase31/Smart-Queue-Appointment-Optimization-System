@@ -61,11 +61,34 @@ public class AppointmentService {
         }
 
         appointment.setPatient(patient);
+        if (!availability.getAvailableDate()
+                .equals(appointment.getAppointmentDate())) {
+
+            throw new RuntimeException(
+                    "Appointment date does not match doctor's availability date"
+            );
+        }
+
+        if (appointment.getAppointmentTime()
+                .isBefore(availability.getStartTime())
+                ||
+                appointment.getAppointmentTime()
+                        .isAfter(availability.getEndTime())) {
+
+            throw new RuntimeException(
+                    "Appointment time is outside doctor's available time"
+            );
+        }
         appointment.setDoctor(doctor);
         appointment.setAvailability(availability);
 
+
+
         return appointmentRepository.save(appointment);
+
     }
+
+
 
     // Get All Appointments
     public List<Appointment> getAllAppointments() {
