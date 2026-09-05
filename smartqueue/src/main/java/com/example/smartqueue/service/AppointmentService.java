@@ -118,4 +118,13 @@ public class AppointmentService {
 
         return appointmentRepository.save(existingAppointment);
     }
+
+    public void deleteAppointment(Long id) {
+
+        if (!appointmentRepository.existsById(id)) {
+            throw new RuntimeException("Appointment not found");
+        }
+
+        appointmentRepository.deleteById(id);
+    }
 }
