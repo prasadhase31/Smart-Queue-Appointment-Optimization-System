@@ -83,6 +83,19 @@ public class AppointmentService {
         appointment.setAvailability(availability);
 
 
+        boolean alreadyBooked =
+                appointmentRepository
+                        .existsByDoctorIdAndAppointmentDateAndAppointmentTime(
+                                doctor.getId(),
+                                appointment.getAppointmentDate(),
+                                appointment.getAppointmentTime()
+                        );
+
+        if (alreadyBooked) {
+            throw new RuntimeException(
+                    "This doctor is already booked for this date and time"
+            );
+        }
 
         return appointmentRepository.save(appointment);
 
