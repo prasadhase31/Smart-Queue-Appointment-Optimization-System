@@ -59,24 +59,19 @@ public class AppointmentService {
                     "This availability does not belong to this doctor"
             );
         }
-
         appointment.setPatient(patient);
+
+        System.out.println("Appointment Date: "
+                + appointment.getAppointmentDate());
+
+        System.out.println("Availability Date: "
+                + availability.getAvailableDate());
+
         if (!availability.getAvailableDate()
                 .equals(appointment.getAppointmentDate())) {
 
             throw new RuntimeException(
                     "Appointment date does not match doctor's availability date"
-            );
-        }
-
-        if (appointment.getAppointmentTime()
-                .isBefore(availability.getStartTime())
-                ||
-                appointment.getAppointmentTime()
-                        .isAfter(availability.getEndTime())) {
-
-            throw new RuntimeException(
-                    "Appointment time is outside doctor's available time"
             );
         }
         appointment.setDoctor(doctor);
