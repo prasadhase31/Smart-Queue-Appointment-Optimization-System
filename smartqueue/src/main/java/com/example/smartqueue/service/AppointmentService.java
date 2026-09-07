@@ -145,6 +145,24 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
+    public Appointment confirmAppointment(Long id) {
+
+        Appointment appointment =
+                appointmentRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException("Appointment not found"));
+
+        if ("CANCELLED".equals(appointment.getStatus())) {
+            throw new RuntimeException(
+                    "Cancelled appointment cannot be confirmed"
+            );
+        }
+
+        appointment.setStatus("CONFIRMED");
+
+        return appointmentRepository.save(appointment);
+    }
+
     public void deleteAppointment(Long id) {
 
         if (!appointmentRepository.existsById(id)) {
