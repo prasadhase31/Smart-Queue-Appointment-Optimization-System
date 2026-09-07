@@ -75,6 +75,19 @@ public class AppointmentController {
         );
     }
 
+    @PutMapping("/{id}/confirm")
+    public ResponseEntity<Appointment> confirmAppointment(
+            @PathVariable Long id) {
+
+        Appointment confirmedAppointment =
+                appointmentService.confirmAppointment(id);
+
+        return new ResponseEntity<>(
+                confirmedAppointment,
+                HttpStatus.OK
+        );
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAppointment(
             @PathVariable Long id) {
