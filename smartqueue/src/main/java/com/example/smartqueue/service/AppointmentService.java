@@ -74,6 +74,26 @@ public class AppointmentService {
                     "Appointment date does not match doctor's availability date"
             );
         }
+
+        if (!appointment.getAppointmentDate()
+                .equals(availability.getAvailableDate())) {
+
+            throw new RuntimeException(
+                    "Appointment date does not match doctor's availability date"
+            );
+        }
+
+// Time Validation
+        if (appointment.getAppointmentTime().isBefore(availability.getStartTime())
+                || appointment.getAppointmentTime().isAfter(availability.getEndTime())) {
+
+            throw new RuntimeException(
+                    "Appointment time is outside doctor's availability time"
+            );
+        }
+
+        appointment.setDoctor(doctor);
+
         appointment.setDoctor(doctor);
         appointment.setAvailability(availability);
 
