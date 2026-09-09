@@ -6,12 +6,11 @@ import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.entity.User;
 import com.example.smartqueue.repository.AppointmentRepository;
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
-import com.example.smartqueue.repository.UserRepository;
-import com.example.smartqueue.repository.DoctorRepository;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
-import com.example.smartqueue.dto.AppointmentRequestDTO;
+import com.example.smartqueue.repository.DoctorRepository;
+import com.example.smartqueue.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -35,70 +34,60 @@ public class AppointmentService {
     }
 
     // Create Appointment
-    public Appointment createAppointment(@Valid @org.jetbrains.annotations.UnknownNullability AppointmentRequestDTO appointment) {
+    public Appointment createAppointment(AppointmentRequestDTO request) {
 
-        User patient = userRepository.findById(
-                appointment.getPatient().getId()
-        ).orElseThrow(() ->
-                new RuntimeException("Patient not found")
-        );
+        // Find Patient
+        User patient = userRepository.findById(request.getPatientId())
+                .orElseThrow(() ->
+                        new RuntimeException("Patient not found")
+                );
 
-        Doctor doctor = doctorRepository.findById(
-                appointment.getDoctor().getId()
-        ).orElseThrow(() ->
-                new RuntimeException("Doctor not found")
-        );
+        // Find Doctor
+        Doctor doctor = doctorRepository.findById(request.getDoctorId())
+                .orElseThrow(() ->
+                        new RuntimeException("Doctor not found")
+                );
 
+        // Find Availability
         DoctorAvailability availability =
                 doctorAvailabilityRepository.findById(
-                        appointment.getAvailability().getId()
+                        request.getAvailabilityId()
                 ).orElseThrow(() ->
                         new RuntimeException("Availability not found")
                 );
 
+        // Doctor ↔ Availability validation
         if (!availability.getDoctor().getId().equals(doctor.getId())) {
             throw new RuntimeException(
                     "This availability does not belong to this doctor"
             );
         }
-        appointment.setPatient(patient);
 
-        System.out.println("Appointment Date: "
-                + appointment.getAppointmentDate());
-
-        System.out.println("Availability Date: "
-                + availability.getAvailableDate());
-
-        if (!availability.getAvailableDate()
-                .equals(appointment.getAppointmentDate())) {
+        // Date validation
+        if (!request.getAppointmentDate()
+                .equals(availability.getAvailableDate())) {
 
             throw new RuntimeException(
                     "Appointment date does not match doctor's availability date"
             );
         }
 
-
-// Time Validation
-        if (appointment.getAppointmentTime().isBefore(availability.getStartTime())
-                || appointment.getAppointmentTime().isAfter(availability.getEndTime())) {
+        // Time validation
+        if (request.getAppointmentTime().isBefore(availability.getStartTime())
+                || request.getAppointmentTime().isAfter(availability.getEndTime())) {
 
             throw new RuntimeException(
                     "Appointment time is outside doctor's availability time"
             );
         }
 
-        appointment.setDoctor(doctor);
-
-        appointment.setDoctor(doctor);
-        appointment.setAvailability(availability);
-
-
+        // Duplicate booking validation
         boolean alreadyBooked =
                 appointmentRepository
                         .existsByDoctorIdAndAppointmentDateAndAppointmentTime(
                                 doctor.getId(),
-                                appointment.getAppointmentDate(),
-                                appointment.getAppointmentTime()
+                                request.getAppointmentDate(),
+                                request.getAppointmentTime()
                         );
 
         if (alreadyBooked) {
@@ -107,6 +96,7 @@ public class AppointmentService {
             );
         }
 
+        // DTO → Entity
         Appointment appointment = new Appointment();
 
         appointment.setPatient(patient);
@@ -116,19 +106,18 @@ public class AppointmentService {
         appointment.setAppointmentTime(request.getAppointmentTime());
         appointment.setReason(request.getReason());
 
+        // Default status
         appointment.setStatus("BOOKED");
 
         return appointmentRepository.save(appointment);
-
     }
-
-
 
     // Get All Appointments
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
 
+    // Update Appointment
     public Appointment updateAppointment(
             Long id,
             Appointment updatedAppointment) {
@@ -153,6 +142,7 @@ public class AppointmentService {
         return appointmentRepository.save(existingAppointment);
     }
 
+    // Cancel Appointment
     public Appointment cancelAppointment(Long id) {
 
         Appointment appointment =
@@ -171,6 +161,7 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
+    // Confirm Appointment
     public Appointment confirmAppointment(Long id) {
 
         Appointment appointment =
@@ -190,12 +181,12 @@ public class AppointmentService {
             );
         }
 
-
         appointment.setStatus("CONFIRMED");
 
         return appointmentRepository.save(appointment);
     }
 
+    // Delete Appointment
     public void deleteAppointment(Long id) {
 
         if (!appointmentRepository.existsById(id)) {
