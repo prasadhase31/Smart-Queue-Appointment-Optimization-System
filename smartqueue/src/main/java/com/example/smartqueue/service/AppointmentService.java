@@ -75,13 +75,6 @@ public class AppointmentService {
             );
         }
 
-        if (!appointment.getAppointmentDate()
-                .equals(availability.getAvailableDate())) {
-
-            throw new RuntimeException(
-                    "Appointment date does not match doctor's availability date"
-            );
-        }
 
 // Time Validation
         if (appointment.getAppointmentTime().isBefore(availability.getStartTime())
@@ -177,6 +170,13 @@ public class AppointmentService {
                     "Cancelled appointment cannot be confirmed"
             );
         }
+
+        if ("CONFIRMED".equals(appointment.getStatus())) {
+            throw new RuntimeException(
+                    "Appointment is already confirmed"
+            );
+        }
+
 
         appointment.setStatus("CONFIRMED");
 
