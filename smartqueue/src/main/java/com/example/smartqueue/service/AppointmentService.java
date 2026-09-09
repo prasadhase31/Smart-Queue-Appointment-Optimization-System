@@ -1,15 +1,17 @@
 package com.example.smartqueue.service;
 
+import com.example.smartqueue.dto.AppointmentRequestDTO;
 import com.example.smartqueue.entity.Appointment;
 import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.entity.User;
 import com.example.smartqueue.repository.AppointmentRepository;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import com.example.smartqueue.repository.UserRepository;
 import com.example.smartqueue.repository.DoctorRepository;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
-
+import com.example.smartqueue.dto.AppointmentRequestDTO;
 import java.util.List;
 
 @Service
@@ -33,7 +35,7 @@ public class AppointmentService {
     }
 
     // Create Appointment
-    public Appointment createAppointment(Appointment appointment) {
+    public Appointment createAppointment(@Valid @org.jetbrains.annotations.UnknownNullability AppointmentRequestDTO appointment) {
 
         User patient = userRepository.findById(
                 appointment.getPatient().getId()
@@ -104,6 +106,17 @@ public class AppointmentService {
                     "This doctor is already booked for this date and time"
             );
         }
+
+        Appointment appointment = new Appointment();
+
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAvailability(availability);
+        appointment.setAppointmentDate(request.getAppointmentDate());
+        appointment.setAppointmentTime(request.getAppointmentTime());
+        appointment.setReason(request.getReason());
+
+        appointment.setStatus("BOOKED");
 
         return appointmentRepository.save(appointment);
 
