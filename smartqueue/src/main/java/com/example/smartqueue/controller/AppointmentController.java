@@ -1,7 +1,9 @@
 package com.example.smartqueue.controller;
 
+import com.example.smartqueue.dto.AppointmentRequestDTO;
 import com.example.smartqueue.entity.Appointment;
 import com.example.smartqueue.service.AppointmentService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +23,10 @@ public class AppointmentController {
     // Create Appointment
     @PostMapping
     public ResponseEntity<Appointment> createAppointment(
-            @RequestBody Appointment appointment) {
+            @Valid @RequestBody AppointmentRequestDTO request) {
 
         Appointment savedAppointment =
-                appointmentService.createAppointment(appointment);
+                appointmentService.createAppointment(request);
 
         return new ResponseEntity<>(
                 savedAppointment,
