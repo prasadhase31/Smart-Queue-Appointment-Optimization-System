@@ -1,3 +1,4 @@
+
 package com.example.smartqueue.controller;
 
 import com.example.smartqueue.dto.AppointmentRequestDTO;
@@ -47,16 +48,14 @@ public class AppointmentController {
         );
     }
 
+    // Update Appointment
     @PutMapping("/{id}")
     public ResponseEntity<Appointment> updateAppointment(
             @PathVariable Long id,
-            @RequestBody Appointment appointment) {
+            @Valid @RequestBody AppointmentRequestDTO request) {
 
         Appointment updatedAppointment =
-                appointmentService.updateAppointment(
-                        id,
-                        appointment
-                );
+                appointmentService.updateAppointment(id, request);
 
         return new ResponseEntity<>(
                 updatedAppointment,
@@ -64,6 +63,7 @@ public class AppointmentController {
         );
     }
 
+    // Cancel Appointment
     @PutMapping("/{id}/cancel")
     public ResponseEntity<Appointment> cancelAppointment(
             @PathVariable Long id) {
@@ -77,6 +77,7 @@ public class AppointmentController {
         );
     }
 
+    // Confirm Appointment
     @PutMapping("/{id}/confirm")
     public ResponseEntity<Appointment> confirmAppointment(
             @PathVariable Long id) {
@@ -90,6 +91,7 @@ public class AppointmentController {
         );
     }
 
+    // Delete Appointment
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAppointment(
             @PathVariable Long id) {
