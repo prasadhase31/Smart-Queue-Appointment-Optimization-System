@@ -12,4 +12,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             LocalDate appointmentDate,
             LocalTime appointmentTime
     );
+    boolean existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndIdNot(
+            Long doctorId,
+            LocalDate appointmentDate,
+            LocalTime appointmentTime,
+            Long appointmentId
+    );
 }
