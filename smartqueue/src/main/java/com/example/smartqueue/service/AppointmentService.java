@@ -127,6 +127,12 @@ public class AppointmentService {
                         .orElseThrow(() ->
                                 new RuntimeException("Appointment not found"));
 
+        if ("CANCELLED".equals(existingAppointment.getStatus())) {
+            throw new RuntimeException(
+                    "Cancelled appointment cannot be updated"
+            );
+        }
+
         existingAppointment.setAppointmentDate(
                 updatedAppointment.getAppointmentDate());
 
