@@ -118,35 +118,108 @@ public class AppointmentService {
     }
 
     // Update Appointment
+
+    // Update Appointment
     public Appointment updateAppointment(
             Long id,
-            Appointment updatedAppointment) {
+            AppointmentRequestDTO request) {
 
+        // Find existing appointment
         Appointment existingAppointment =
                 appointmentRepository.findById(id)
                         .orElseThrow(() ->
                                 new RuntimeException("Appointment not found"));
 
+        // Cancelled appointment cannot be updated
         if ("CANCELLED".equals(existingAppointment.getStatus())) {
             throw new RuntimeException(
                     "Cancelled appointment cannot be updated"
             );
         }
 
+        // Find Patient
+        User patient = userRepository.findById(request.getPatientId())
+                .orElseThrow(() ->
+                        new RuntimeException("Patient not found")
+                );
+
+        // Find Doctor
+        Doctor doctor = doctorRepository.findById(request.getDoctorId())
+                .orElseThrow(() ->
+                        new RuntimeException("Doctor not found")
+                );
+
+        // Find Availability
+        DoctorAvailability availability =
+                doctorAvailabilityRepository.findById(
+                        request.getAvailabilityId()
+                ).orElseThrow(() ->
+                        new RuntimeException("Availability not found")
+                );
+
+        // Doctor ↔ Availability validation
+        if (!availability.getDoctor().getId().equals(doctor.getId())) {
+            throw new RuntimeException(
+                    "This availability does not belong to this doctor"
+            );
+        }
+
+        // Date validation
+        if (!request.getAppointmentDate()
+                .equals(availability.getAvailableDate())) {
+
+            throw new RuntimeException(
+                    "Appointment date does not match doctor's availability date"
+            );
+        }
+
+        // Time validation
+        if (request.getAppointmentTime().isBefore(availability.getStartTime())
+                || request.getAppointmentTime().isAfter(availability.getEndTime())) {
+
+            throw new RuntimeException(
+                    "Appointment time is outside doctor's availability time"
+            );
+        }
+
+        // Duplicate booking validation
+        boolean alreadyBooked =
+                appointmentRepository
+                        .existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndIdNot(
+                                doctor.getId(),
+                                request.getAppointmentDate(),
+                                request.getAppointmentTime(),
+                                id
+                        );
+
+        if (alreadyBooked) {
+            throw new RuntimeException(
+                    "This doctor is already booked for this date and time"
+            );
+        }
+
+        // Update appointment
+        existingAppointment.setPatient(patient);
+        existingAppointment.setDoctor(doctor);
+        existingAppointment.setAvailability(availability);
         existingAppointment.setAppointmentDate(
-                updatedAppointment.getAppointmentDate());
-
+                request.getAppointmentDate()
+        );
         existingAppointment.setAppointmentTime(
-                updatedAppointment.getAppointmentTime());
-
-        existingAppointment.setStatus(
-                updatedAppointment.getStatus());
-
+                request.getAppointmentTime()
+        );
         existingAppointment.setReason(
-                updatedAppointment.getReason());
+                request.getReason()
+        );
+
+        // Keep existing status
+        // Status should be managed by confirm/cancel APIs
+        // existingAppointment.setStatus(...) is intentionally removed
 
         return appointmentRepository.save(existingAppointment);
     }
+
+
 
     // Cancel Appointment
     public Appointment cancelAppointment(Long id) {
