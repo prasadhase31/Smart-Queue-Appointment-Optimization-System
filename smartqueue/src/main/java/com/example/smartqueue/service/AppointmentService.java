@@ -10,7 +10,10 @@ import com.example.smartqueue.repository.DoctorAvailabilityRepository;
 import com.example.smartqueue.repository.DoctorRepository;
 import com.example.smartqueue.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
+import com.example.smartqueue.dto.AppointmentResponseDTO;
+import com.example.smartqueue.dto.UserResponseDTO;
+import com.example.smartqueue.dto.DoctorResponseDTO;
+import com.example.smartqueue.dto.AvailabilityResponseDTO;
 import java.util.List;
 
 @Service
