@@ -277,4 +277,55 @@ public class AppointmentService {
 
         appointmentRepository.deleteById(id);
     }
+    private AppointmentResponseDTO mapToResponseDTO(Appointment appointment) {
+
+        AppointmentResponseDTO response = new AppointmentResponseDTO();
+
+        response.setId(appointment.getId());
+        response.setAppointmentDate(appointment.getAppointmentDate());
+        response.setAppointmentTime(appointment.getAppointmentTime());
+        response.setReason(appointment.getReason());
+        response.setStatus(appointment.getStatus());
+
+        // Patient
+        UserResponseDTO patient = new UserResponseDTO();
+        patient.setId(appointment.getPatient().getId());
+        patient.setName(appointment.getPatient().getName());
+        patient.setEmail(appointment.getPatient().getEmail());
+        patient.setPhone(appointment.getPatient().getPhone());
+        patient.setRole(appointment.getPatient().getRole());
+
+        response.setPatient(patient);
+
+        // Doctor
+        DoctorResponseDTO doctor = new DoctorResponseDTO();
+        doctor.setId(appointment.getDoctor().getId());
+        doctor.setName(appointment.getDoctor().getName());
+        doctor.setEmail(appointment.getDoctor().getEmail());
+        doctor.setPhone(appointment.getDoctor().getPhone());
+        doctor.setSpecialization(appointment.getDoctor().getSpecialization());
+        doctor.setConsultationFee(appointment.getDoctor().getConsultationFee());
+        doctor.setStatus(appointment.getDoctor().getStatus());
+        doctor.setCreatedAt(appointment.getDoctor().getCreatedAt());
+
+        response.setDoctor(doctor);
+
+        // Availability
+        AvailabilityResponseDTO availability = new AvailabilityResponseDTO();
+        availability.setId(appointment.getAvailability().getId());
+        availability.setAvailableDate(
+                appointment.getAvailability().getAvailableDate());
+        availability.setDayOfWeek(
+                appointment.getAvailability().getDayOfWeek());
+        availability.setStartTime(
+                appointment.getAvailability().getStartTime());
+        availability.setEndTime(
+                appointment.getAvailability().getEndTime());
+        availability.setIsAvailable(
+                appointment.getAvailability().getIsAvailable());
+
+        response.setAvailability(availability);
+
+        return response;
+    }
 }
