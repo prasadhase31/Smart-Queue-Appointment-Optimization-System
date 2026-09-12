@@ -130,7 +130,7 @@ public class AppointmentService {
     // Update Appointment
 
     // Update Appointment
-    public Appointment updateAppointment(
+    public AppointmentResponseDTO updateAppointment(
             Long id,
             AppointmentRequestDTO request) {
 
@@ -226,7 +226,10 @@ public class AppointmentService {
         // Status should be managed by confirm/cancel APIs
         // existingAppointment.setStatus(...) is intentionally removed
 
-        return appointmentRepository.save(existingAppointment);
+        Appointment updatedAppointment =
+                appointmentRepository.save(existingAppointment);
+
+        return mapToResponseDTO(updatedAppointment);
     }
 
 
