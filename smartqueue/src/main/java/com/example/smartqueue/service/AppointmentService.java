@@ -116,8 +116,13 @@ public class AppointmentService {
     }
 
     // Get All Appointments
-    public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
+    public List<AppointmentResponseDTO> getAllAppointments() {
+
+        List<Appointment> appointments = appointmentRepository.findAll();
+
+        return appointments.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
 
     // Update Appointment

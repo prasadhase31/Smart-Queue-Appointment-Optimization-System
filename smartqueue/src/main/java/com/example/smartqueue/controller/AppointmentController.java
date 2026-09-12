@@ -2,6 +2,7 @@
 package com.example.smartqueue.controller;
 
 import com.example.smartqueue.dto.AppointmentRequestDTO;
+import com.example.smartqueue.dto.AppointmentResponseDTO;
 import com.example.smartqueue.entity.Appointment;
 import com.example.smartqueue.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -37,13 +38,12 @@ public class AppointmentController {
 
     // Get All Appointments
     @GetMapping
-    public List<AppointmentResponseDTO> getAllAppointments() {
+    public ResponseEntity<List<AppointmentResponseDTO>> getAllAppointments() {
 
-        List<Appointment> appointments = appointmentRepository.findAll();
+        List<AppointmentResponseDTO> appointments =
+                appointmentService.getAllAppointments();
 
-        return appointments.stream()
-                .map(this::mapToResponseDTO)
-                .toList();
+        return new ResponseEntity<>(appointments, HttpStatus.OK);
     }
 
     // Update Appointment
