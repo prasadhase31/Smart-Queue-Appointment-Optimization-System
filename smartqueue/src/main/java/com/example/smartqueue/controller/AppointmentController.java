@@ -24,16 +24,13 @@ public class AppointmentController {
 
     // Create Appointment
     @PostMapping
-    public ResponseEntity<Appointment> createAppointment(
+    public ResponseEntity<AppointmentResponseDTO> createAppointment(
             @Valid @RequestBody AppointmentRequestDTO request) {
 
-        Appointment savedAppointment =
+        AppointmentResponseDTO savedAppointment =
                 appointmentService.createAppointment(request);
 
-        return new ResponseEntity<>(
-                savedAppointment,
-                HttpStatus.CREATED
-        );
+        return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
     }
 
     // Get All Appointments
