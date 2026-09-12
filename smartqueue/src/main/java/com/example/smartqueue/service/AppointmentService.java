@@ -37,7 +37,7 @@ public class AppointmentService {
     }
 
     // Create Appointment
-    public Appointment createAppointment(AppointmentRequestDTO request) {
+    public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request) {
 
         // Find Patient
         User patient = userRepository.findById(request.getPatientId())
@@ -112,7 +112,9 @@ public class AppointmentService {
         // Default status
         appointment.setStatus("BOOKED");
 
-        return appointmentRepository.save(appointment);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        return mapToResponseDTO(savedAppointment);
     }
 
     // Get All Appointments
