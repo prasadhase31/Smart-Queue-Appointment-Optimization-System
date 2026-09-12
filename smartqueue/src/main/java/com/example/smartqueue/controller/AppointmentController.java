@@ -37,15 +37,13 @@ public class AppointmentController {
 
     // Get All Appointments
     @GetMapping
-    public ResponseEntity<List<Appointment>> getAllAppointments() {
+    public List<AppointmentResponseDTO> getAllAppointments() {
 
-        List<Appointment> appointments =
-                appointmentService.getAllAppointments();
+        List<Appointment> appointments = appointmentRepository.findAll();
 
-        return new ResponseEntity<>(
-                appointments,
-                HttpStatus.OK
-        );
+        return appointments.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
 
     // Update Appointment
