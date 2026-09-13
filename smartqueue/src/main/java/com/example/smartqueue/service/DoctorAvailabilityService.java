@@ -3,6 +3,7 @@ package com.example.smartqueue.service;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
 import org.springframework.stereotype.Service;
+import com.example.smartqueue.dto.AvailabilityResponseDTO;
 
 import java.util.List;
 
@@ -16,10 +17,14 @@ public class DoctorAvailabilityService {
     }
 
 
-    public DoctorAvailability createAvailability(DoctorAvailability availability) {
-        return doctorAvailabilityRepository.save(availability);
-    }
+    public AvailabilityResponseDTO createAvailability(
+            DoctorAvailability availability) {
 
+        DoctorAvailability savedAvailability =
+                doctorAvailabilityRepository.save(availability);
+
+        return mapToResponseDTO(savedAvailability);
+    }
 
     public List<DoctorAvailability> getAllAvailability() {
         return doctorAvailabilityRepository.findAll();
@@ -36,5 +41,30 @@ public class DoctorAvailabilityService {
     }
 
     public void deleteAvailability(Long id) {
+    }
+    private AvailabilityResponseDTO mapToResponseDTO(
+            DoctorAvailability availability) {
+
+        AvailabilityResponseDTO response =
+                new AvailabilityResponseDTO();
+
+        response.setId(availability.getId());
+
+        response.setAvailableDate(
+                availability.getAvailableDate());
+
+        response.setDayOfWeek(
+                availability.getDayOfWeek());
+
+        response.setStartTime(
+                availability.getStartTime());
+
+        response.setEndTime(
+                availability.getEndTime());
+
+        response.setIsAvailable(
+                availability.getIsAvailable());
+
+        return response;
     }
 }
