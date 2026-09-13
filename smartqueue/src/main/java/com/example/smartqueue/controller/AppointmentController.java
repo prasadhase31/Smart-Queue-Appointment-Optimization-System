@@ -60,10 +60,10 @@ public class AppointmentController {
 
     // Cancel Appointment
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<Appointment> cancelAppointment(
+    public ResponseEntity<AppointmentResponseDTO> cancelAppointment(
             @PathVariable Long id) {
 
-        Appointment cancelledAppointment =
+        AppointmentResponseDTO cancelledAppointment =
                 appointmentService.cancelAppointment(id);
 
         return new ResponseEntity<>(
