@@ -1,5 +1,6 @@
 package com.example.smartqueue.controller;
 
+import com.example.smartqueue.dto.AvailabilityResponseDTO;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.service.DoctorAvailabilityService;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,10 @@ public class DoctorAvailabilityController {
 
 
     @PostMapping
-    public ResponseEntity<DoctorAvailability> createAvailability(
+    public ResponseEntity<AvailabilityResponseDTO> createAvailability(
             @RequestBody DoctorAvailability availability) {
 
-        DoctorAvailability savedAvailability =
+        AvailabilityResponseDTO savedAvailability =
                 doctorAvailabilityService.createAvailability(availability);
 
         return new ResponseEntity<>(
