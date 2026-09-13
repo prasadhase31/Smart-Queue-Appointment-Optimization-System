@@ -74,10 +74,10 @@ public class AppointmentController {
 
     // Confirm Appointment
     @PutMapping("/{id}/confirm")
-    public ResponseEntity<Appointment> confirmAppointment(
+    public ResponseEntity<AppointmentResponseDTO> confirmAppointment(
             @PathVariable Long id) {
 
-        Appointment confirmedAppointment =
+        AppointmentResponseDTO confirmedAppointment =
                 appointmentService.confirmAppointment(id);
 
         return new ResponseEntity<>(
@@ -85,7 +85,6 @@ public class AppointmentController {
                 HttpStatus.OK
         );
     }
-
     // Delete Appointment
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAppointment(
