@@ -255,7 +255,7 @@ public class AppointmentService {
     }
 
     // Confirm Appointment
-    public Appointment confirmAppointment(Long id) {
+    public AppointmentResponseDTO confirmAppointment(Long id) {
 
         Appointment appointment =
                 appointmentRepository.findById(id)
@@ -274,9 +274,10 @@ public class AppointmentService {
             );
         }
 
-        appointment.setStatus("CONFIRMED");
+        appointment.setStatus("CONFIRMED");Appointment confirmedAppointment =
+                appointmentRepository.save(appointment);
 
-        return appointmentRepository.save(appointment);
+        return mapToResponseDTO(confirmedAppointment);
     }
 
     // Delete Appointment
