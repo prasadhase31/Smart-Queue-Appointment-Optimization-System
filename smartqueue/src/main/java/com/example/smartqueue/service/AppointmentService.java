@@ -235,7 +235,7 @@ public class AppointmentService {
 
 
     // Cancel Appointment
-    public Appointment cancelAppointment(Long id) {
+    public AppointmentResponseDTO cancelAppointment(Long id) {
 
         Appointment appointment =
                 appointmentRepository.findById(id)
@@ -243,14 +243,15 @@ public class AppointmentService {
                                 new RuntimeException("Appointment not found"));
 
         if ("CANCELLED".equals(appointment.getStatus())) {
-            throw new RuntimeException(
-                    "Appointment is already cancelled"
-            );
+            throw new RuntimeException("Appointment is already cancelled");
         }
 
         appointment.setStatus("CANCELLED");
 
-        return appointmentRepository.save(appointment);
+        Appointment cancelledAppointment =
+                appointmentRepository.save(appointment);
+
+        return mapToResponseDTO(cancelledAppointment);
     }
 
     // Confirm Appointment
