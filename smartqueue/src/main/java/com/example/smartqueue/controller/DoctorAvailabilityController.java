@@ -57,15 +57,16 @@ public class DoctorAvailabilityController {
                 availabilityList,
                 HttpStatus.OK
         );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<DoctorAvailability> updateAvailability(
+    }@PutMapping("/{id}")
+    public ResponseEntity<AvailabilityResponseDTO> updateAvailability(
             @PathVariable Long id,
             @RequestBody DoctorAvailability availability) {
 
-        DoctorAvailability updatedAvailability =
-                doctorAvailabilityService.updateAvailability(id, availability);
+        AvailabilityResponseDTO updatedAvailability =
+                doctorAvailabilityService.updateAvailability(
+                        id,
+                        availability
+                );
 
         return new ResponseEntity<>(
                 updatedAvailability,
