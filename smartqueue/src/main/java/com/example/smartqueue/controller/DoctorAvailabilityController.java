@@ -47,10 +47,10 @@ public class DoctorAvailabilityController {
         );
     }
     @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<List<DoctorAvailability>> getAvailabilityByDoctorId(
+    public ResponseEntity<List<AvailabilityResponseDTO>> getAvailabilityByDoctorId(
             @PathVariable Long doctorId) {
 
-        List<DoctorAvailability> availabilityList =
+        List<AvailabilityResponseDTO> availabilityList =
                 doctorAvailabilityService.getAvailabilityByDoctorId(doctorId);
 
         return new ResponseEntity<>(

@@ -36,8 +36,14 @@ public class DoctorAvailabilityService {
                 .toList();
     }
 
-    public List<DoctorAvailability> getAvailabilityByDoctorId(Long doctorId) {
-        return doctorAvailabilityRepository.findByDoctorId(doctorId);
+    public List<AvailabilityResponseDTO> getAvailabilityByDoctorId(Long doctorId) {
+
+        List<DoctorAvailability> availabilityList =
+                doctorAvailabilityRepository.findByDoctorId(doctorId);
+
+        return availabilityList.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
 
     public DoctorAvailability updateAvailability(
