@@ -36,15 +36,14 @@ public class DoctorAvailabilityController {
 
 
     @GetMapping
-    public ResponseEntity<List<DoctorAvailability>> getAllAvailability() {
+    public List<AvailabilityResponseDTO> getAllAvailability() {
 
         List<DoctorAvailability> availabilityList =
-                doctorAvailabilityService.getAllAvailability();
+                doctorAvailabilityRepository.findAll();
 
-        return new ResponseEntity<>(
-                availabilityList,
-                HttpStatus.OK
-        );
+        return availabilityList.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
 
     @GetMapping("/doctor/{doctorId}")
