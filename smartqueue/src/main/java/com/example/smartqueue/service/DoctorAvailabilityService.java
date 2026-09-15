@@ -1,9 +1,9 @@
 package com.example.smartqueue.service;
 
+import com.example.smartqueue.dto.AvailabilityResponseDTO;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
 import org.springframework.stereotype.Service;
-import com.example.smartqueue.dto.AvailabilityResponseDTO;
 
 import java.util.List;
 
@@ -12,10 +12,12 @@ public class DoctorAvailabilityService {
 
     private final DoctorAvailabilityRepository doctorAvailabilityRepository;
 
-    public DoctorAvailabilityService(DoctorAvailabilityRepository doctorAvailabilityRepository) {
-        this.doctorAvailabilityRepository = doctorAvailabilityRepository;
-    }
+    public DoctorAvailabilityService(
+            DoctorAvailabilityRepository doctorAvailabilityRepository) {
 
+        this.doctorAvailabilityRepository =
+                doctorAvailabilityRepository;
+    }
 
     public AvailabilityResponseDTO createAvailability(
             DoctorAvailability availability) {
@@ -36,7 +38,8 @@ public class DoctorAvailabilityService {
                 .toList();
     }
 
-    public List<AvailabilityResponseDTO> getAvailabilityByDoctorId(Long doctorId) {
+    public List<AvailabilityResponseDTO> getAvailabilityByDoctorId(
+            Long doctorId) {
 
         List<DoctorAvailability> availabilityList =
                 doctorAvailabilityRepository.findByDoctorId(doctorId);
@@ -50,8 +53,37 @@ public class DoctorAvailabilityService {
             Long id,
             DoctorAvailability updatedAvailability) {
 
+        DoctorAvailability existingAvailability =
+                doctorAvailabilityRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Availability not found"));
+
+        existingAvailability.setAvailableDate(
+                updatedAvailability.getAvailableDate());
+
+        existingAvailability.setDayOfWeek(
+                updatedAvailability.getDayOfWeek());
+
+        existingAvailability.setStartTime(
+                updatedAvailability.getStartTime());
+
+        existingAvailability.setEndTime(
+                updatedAvailability.getEndTime());
+
+        existingAvailability.setIsAvailable(
+                updatedAvailability.getIsAvailable());
+
+        DoctorAvailability savedAvailability =
+                doctorAvailabilityRepository.save(
+                        existingAvailability);
+
+        return mapToResponseDTO(savedAvailability);
+    }
+
     public void deleteAvailability(Long id) {
     }
+
     private AvailabilityResponseDTO mapToResponseDTO(
             DoctorAvailability availability) {
 
