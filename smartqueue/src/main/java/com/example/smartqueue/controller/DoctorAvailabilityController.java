@@ -6,7 +6,7 @@ import com.example.smartqueue.service.DoctorAvailabilityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -23,7 +23,7 @@ public class DoctorAvailabilityController {
 
     @PostMapping
     public ResponseEntity<AvailabilityResponseDTO> createAvailability(
-            @RequestBody DoctorAvailability availability) {
+            @Valid @RequestBody DoctorAvailability availability) {
 
         AvailabilityResponseDTO savedAvailability =
                 doctorAvailabilityService.createAvailability(availability);
@@ -57,10 +57,11 @@ public class DoctorAvailabilityController {
                 availabilityList,
                 HttpStatus.OK
         );
-    }@PutMapping("/{id}")
+    }
+    @PutMapping("/{id}")
     public ResponseEntity<AvailabilityResponseDTO> updateAvailability(
             @PathVariable Long id,
-            @RequestBody DoctorAvailability availability) {
+            @Valid @RequestBody DoctorAvailability availability) {
 
         AvailabilityResponseDTO updatedAvailability =
                 doctorAvailabilityService.updateAvailability(
