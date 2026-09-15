@@ -46,11 +46,9 @@ public class DoctorAvailabilityService {
                 .toList();
     }
 
-    public DoctorAvailability updateAvailability(
+    public AvailabilityResponseDTO updateAvailability(
             Long id,
             DoctorAvailability updatedAvailability) {
-        return null;
-    }
 
     public void deleteAvailability(Long id) {
     }
