@@ -22,6 +22,13 @@ public class DoctorAvailabilityService {
     public AvailabilityResponseDTO createAvailability(
             DoctorAvailability availability) {
 
+        if (!availability.getStartTime()
+                .isBefore(availability.getEndTime())) {
+
+            throw new RuntimeException(
+                    "Start time must be before end time");
+        }
+
         DoctorAvailability savedAvailability =
                 doctorAvailabilityRepository.save(availability);
 
@@ -58,6 +65,13 @@ public class DoctorAvailabilityService {
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Availability not found"));
+
+        if (!updatedAvailability.getStartTime()
+                .isBefore(updatedAvailability.getEndTime())) {
+
+            throw new RuntimeException(
+                    "Start time must be before end time");
+        }
 
         existingAvailability.setAvailableDate(
                 updatedAvailability.getAvailableDate());
