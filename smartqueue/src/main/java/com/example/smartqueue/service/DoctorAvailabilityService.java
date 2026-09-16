@@ -29,6 +29,21 @@ public class DoctorAvailabilityService {
                     "Start time must be before end time");
         }
 
+        boolean exists =
+                doctorAvailabilityRepository
+                        .existsByDoctorIdAndAvailableDateAndStartTimeAndEndTime(
+                                availability.getDoctor().getId(),
+                                availability.getAvailableDate(),
+                                availability.getStartTime(),
+                                availability.getEndTime()
+                        );
+
+        if (exists) {
+            throw new RuntimeException(
+                    "Availability already exists for this doctor on this date and time"
+            );
+        }
+
         DoctorAvailability savedAvailability =
                 doctorAvailabilityRepository.save(availability);
 
