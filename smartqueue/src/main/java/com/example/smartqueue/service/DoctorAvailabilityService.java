@@ -44,6 +44,21 @@ public class DoctorAvailabilityService {
             );
         }
 
+        boolean overlapping =
+                doctorAvailabilityRepository
+                        .existsOverlappingAvailability(
+                                availability.getDoctor().getId(),
+                                availability.getAvailableDate(),
+                                availability.getStartTime(),
+                                availability.getEndTime()
+                        );
+
+        if (overlapping) {
+            throw new RuntimeException(
+                    "Availability overlaps with an existing availability"
+            );
+        }
+
         DoctorAvailability savedAvailability =
                 doctorAvailabilityRepository.save(availability);
 
