@@ -29,13 +29,14 @@ public interface DoctorAvailabilityRepository
     FROM DoctorAvailability a
     WHERE a.doctor.id = :doctorId
     AND a.availableDate = :availableDate
+    AND a.id != :availabilityId
     AND a.startTime < :endTime
     AND a.endTime > :startTime
 """)
-    boolean existsOverlappingAvailability(
+    boolean existsOverlappingAvailabilityForUpdate(
+            @Param("availabilityId") Long availabilityId,
             @Param("doctorId") Long doctorId,
             @Param("availableDate") LocalDate availableDate,
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime
     );
-}
