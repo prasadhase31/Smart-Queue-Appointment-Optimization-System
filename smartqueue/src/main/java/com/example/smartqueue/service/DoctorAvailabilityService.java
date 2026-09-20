@@ -12,6 +12,7 @@ public class DoctorAvailabilityService {
 
     private final DoctorAvailabilityRepository doctorAvailabilityRepository;
 
+
     public DoctorAvailabilityService(
             DoctorAvailabilityRepository doctorAvailabilityRepository) {
 
@@ -19,16 +20,25 @@ public class DoctorAvailabilityService {
                 doctorAvailabilityRepository;
     }
 
+
+    // =========================
+    // CREATE AVAILABILITY
+    // =========================
+
     public AvailabilityResponseDTO createAvailability(
             DoctorAvailability availability) {
 
+        // 1. Start time must be before end time
         if (!availability.getStartTime()
                 .isBefore(availability.getEndTime())) {
 
             throw new RuntimeException(
-                    "Start time must be before end time");
+                    "Start time must be before end time"
+            );
         }
 
+
+        // 2. Check exact duplicate availability
         boolean exists =
                 doctorAvailabilityRepository
                         .existsByDoctorIdAndAvailableDateAndStartTimeAndEndTime(
@@ -39,11 +49,14 @@ public class DoctorAvailabilityService {
                         );
 
         if (exists) {
+
             throw new RuntimeException(
                     "Availability already exists for this doctor on this date and time"
             );
         }
 
+
+        // 3. Check overlapping availability
         boolean overlapping =
                 doctorAvailabilityRepository
                         .existsOverlappingAvailability(
@@ -54,16 +67,26 @@ public class DoctorAvailabilityService {
                         );
 
         if (overlapping) {
+
             throw new RuntimeException(
                     "Availability overlaps with an existing availability"
             );
         }
 
+
+        // 4. Save availability
         DoctorAvailability savedAvailability =
                 doctorAvailabilityRepository.save(availability);
 
+
+        // 5. Return DTO
         return mapToResponseDTO(savedAvailability);
     }
+
+
+    // =========================
+    // GET ALL AVAILABILITY
+    // =========================
 
     public List<AvailabilityResponseDTO> getAllAvailability() {
 
@@ -74,6 +97,11 @@ public class DoctorAvailabilityService {
                 .map(this::mapToResponseDTO)
                 .toList();
     }
+
+
+    // =========================
+    // GET AVAILABILITY BY DOCTOR
+    // =========================
 
     public List<AvailabilityResponseDTO> getAvailabilityByDoctorId(
             Long doctorId) {
@@ -86,47 +114,101 @@ public class DoctorAvailabilityService {
                 .toList();
     }
 
+
+    // =========================
+    // UPDATE AVAILABILITY
+    // =========================
+
     public AvailabilityResponseDTO updateAvailability(
             Long id,
             DoctorAvailability updatedAvailability) {
 
+
+        // 1. Find existing availability
         DoctorAvailability existingAvailability =
                 doctorAvailabilityRepository.findById(id)
                         .orElseThrow(() ->
                                 new RuntimeException(
-                                        "Availability not found"));
+                                        "Availability not found"
+                                ));
 
+
+        // 2. Start time must be before end time
         if (!updatedAvailability.getStartTime()
                 .isBefore(updatedAvailability.getEndTime())) {
 
             throw new RuntimeException(
-                    "Start time must be before end time");
+                    "Start time must be before end time"
+            );
         }
 
+
+        // 3. Check overlapping availability
+        // Existing record itself is excluded using ID
+        boolean overlapping =
+                doctorAvailabilityRepository
+                        .existsOverlappingAvailabilityForUpdate(
+                                id,
+                                existingAvailability.getDoctor().getId(),
+                                updatedAvailability.getAvailableDate(),
+                                updatedAvailability.getStartTime(),
+                                updatedAvailability.getEndTime()
+                        );
+
+        if (overlapping) {
+
+            throw new RuntimeException(
+                    "Availability overlaps with an existing availability"
+            );
+        }
+
+
+        // 4. Update fields
         existingAvailability.setAvailableDate(
-                updatedAvailability.getAvailableDate());
+                updatedAvailability.getAvailableDate()
+        );
 
         existingAvailability.setDayOfWeek(
-                updatedAvailability.getDayOfWeek());
+                updatedAvailability.getDayOfWeek()
+        );
 
         existingAvailability.setStartTime(
-                updatedAvailability.getStartTime());
+                updatedAvailability.getStartTime()
+        );
 
         existingAvailability.setEndTime(
-                updatedAvailability.getEndTime());
+                updatedAvailability.getEndTime()
+        );
 
         existingAvailability.setIsAvailable(
-                updatedAvailability.getIsAvailable());
+                updatedAvailability.getIsAvailable()
+        );
 
+
+        // 5. Save updated availability
         DoctorAvailability savedAvailability =
                 doctorAvailabilityRepository.save(
-                        existingAvailability);
+                        existingAvailability
+                );
 
+
+        // 6. Return DTO
         return mapToResponseDTO(savedAvailability);
     }
 
+
+    // =========================
+    // DELETE AVAILABILITY
+    // =========================
+
     public void deleteAvailability(Long id) {
+        // Currently skipped as discussed
     }
+
+
+    // =========================
+    // ENTITY → DTO
+    // =========================
 
     private AvailabilityResponseDTO mapToResponseDTO(
             DoctorAvailability availability) {
@@ -134,22 +216,29 @@ public class DoctorAvailabilityService {
         AvailabilityResponseDTO response =
                 new AvailabilityResponseDTO();
 
-        response.setId(availability.getId());
+        response.setId(
+                availability.getId()
+        );
 
         response.setAvailableDate(
-                availability.getAvailableDate());
+                availability.getAvailableDate()
+        );
 
         response.setDayOfWeek(
-                availability.getDayOfWeek());
+                availability.getDayOfWeek()
+        );
 
         response.setStartTime(
-                availability.getStartTime());
+                availability.getStartTime()
+        );
 
         response.setEndTime(
-                availability.getEndTime());
+                availability.getEndTime()
+        );
 
         response.setIsAvailable(
-                availability.getIsAvailable());
+                availability.getIsAvailable()
+        );
 
         return response;
     }
