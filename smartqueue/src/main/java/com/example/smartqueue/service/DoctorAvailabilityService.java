@@ -39,6 +39,14 @@ public class DoctorAvailabilityService {
                 new RuntimeException("Doctor not found")
         );
 
+        if (availability.getAvailableDate()
+                .getDayOfWeek()
+                != availability.getDayOfWeek()) {
+
+            throw new RuntimeException(
+                    "Day of week does not match available date"
+            );
+        }
 
 
         // 1. Start time must be before end time
