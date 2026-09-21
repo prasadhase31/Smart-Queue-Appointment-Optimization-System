@@ -39,6 +39,8 @@ public class DoctorAvailabilityService {
                 new RuntimeException("Doctor not found")
         );
 
+
+
         // 1. Start time must be before end time
         if (!availability.getStartTime()
                 .isBefore(availability.getEndTime())) {
@@ -143,6 +145,16 @@ public class DoctorAvailabilityService {
                                         "Availability not found"
                                 ));
 
+
+
+        if (updatedAvailability.getAvailableDate()
+                .getDayOfWeek()
+                != updatedAvailability.getDayOfWeek()) {
+
+            throw new RuntimeException(
+                    "Day of week does not match available date"
+            );
+        }
 
         // 2. Start time must be before end time
         if (!updatedAvailability.getStartTime()
