@@ -2,15 +2,12 @@ package com.example.smartqueue.repository;
 
 import com.example.smartqueue.entity.DoctorAvailability;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public interface DoctorAvailabilityRepository
         extends JpaRepository<DoctorAvailability, Long> {
@@ -25,14 +22,29 @@ public interface DoctorAvailabilityRepository
     );
 
     @Query("""
-    SELECT COUNT(a) > 0
-    FROM DoctorAvailability a
-    WHERE a.doctor.id = :doctorId
-    AND a.availableDate = :availableDate
-    AND a.id != :availabilityId
-    AND a.startTime < :endTime
-    AND a.endTime > :startTime
-""")
+        SELECT COUNT(a) > 0
+        FROM DoctorAvailability a
+        WHERE a.doctor.id = :doctorId
+        AND a.availableDate = :availableDate
+        AND a.startTime < :endTime
+        AND a.endTime > :startTime
+        """)
+    boolean existsOverlappingAvailability(
+            @Param("doctorId") Long doctorId,
+            @Param("availableDate") LocalDate availableDate,
+            @Param("startTime") LocalTime startTime,
+            @Param("endTime") LocalTime endTime
+    );
+
+    @Query("""
+        SELECT COUNT(a) > 0
+        FROM DoctorAvailability a
+        WHERE a.doctor.id = :doctorId
+        AND a.availableDate = :availableDate
+        AND a.id != :availabilityId
+        AND a.startTime < :endTime
+        AND a.endTime > :startTime
+        """)
     boolean existsOverlappingAvailabilityForUpdate(
             @Param("availabilityId") Long availabilityId,
             @Param("doctorId") Long doctorId,
@@ -40,3 +52,4 @@ public interface DoctorAvailabilityRepository
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime
     );
+}
