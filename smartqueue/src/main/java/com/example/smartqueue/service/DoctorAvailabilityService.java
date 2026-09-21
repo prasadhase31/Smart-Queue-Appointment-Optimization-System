@@ -4,6 +4,7 @@ import com.example.smartqueue.dto.AvailabilityResponseDTO;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
 import org.springframework.stereotype.Service;
+import com.example.smartqueue.repository.DoctorRepository;
 
 import java.util.List;
 
@@ -11,13 +12,17 @@ import java.util.List;
 public class DoctorAvailabilityService {
 
     private final DoctorAvailabilityRepository doctorAvailabilityRepository;
-
+    private final DoctorRepository doctorRepository;
 
     public DoctorAvailabilityService(
-            DoctorAvailabilityRepository doctorAvailabilityRepository) {
+            DoctorAvailabilityRepository doctorAvailabilityRepository,
+            DoctorRepository doctorRepository) {
 
         this.doctorAvailabilityRepository =
                 doctorAvailabilityRepository;
+
+        this.doctorRepository =
+                doctorRepository;
     }
 
 
@@ -27,6 +32,12 @@ public class DoctorAvailabilityService {
 
     public AvailabilityResponseDTO createAvailability(
             DoctorAvailability availability) {
+
+        doctorRepository.findById(
+                availability.getDoctor().getId()
+        ).orElseThrow(() ->
+                new RuntimeException("Doctor not found")
+        );
 
         // 1. Start time must be before end time
         if (!availability.getStartTime()
