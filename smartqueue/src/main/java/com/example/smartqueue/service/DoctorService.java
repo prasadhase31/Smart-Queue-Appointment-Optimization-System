@@ -1,6 +1,7 @@
 package com.example.smartqueue.service;
 
 import com.example.smartqueue.dto.DoctorRequest;
+import com.example.smartqueue.dto.DoctorResponseDTO;
 import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
@@ -37,20 +38,42 @@ public class DoctorService {
         doctor.setStatus("ACTIVE");
         doctor.setCreatedAt(LocalDateTime.now());
 
-        return doctorRepository.save(doctor);
+        Doctor savedDoctor = doctorRepository.save(doctor);
+
+        return mapToResponseDTO(savedDoctor);
     }
 
-    public List<Doctor> getAllDoctors() {
+    public List<DoctorResponseDTO> getAllDoctors() {
 
-        return doctorRepository.findAll();
+        return doctorRepository.findAll()
+                .stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
 
-    public Doctor getDoctorById(Long id) {
+    public DoctorResponseDTO getDoctorById(Long id) {
 
-        return doctorRepository.findById(id)
+        Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Doctor not found with id: " + id
                         ));
+
+        return mapToResponseDTO(doctor);
+    }
+    private DoctorResponseDTO mapToResponseDTO(Doctor doctor) {
+
+        DoctorResponseDTO response = new DoctorResponseDTO();
+
+        response.setId(doctor.getId());
+        response.setName(doctor.getName());
+        response.setEmail(doctor.getEmail());
+        response.setPhone(doctor.getPhone());
+        response.setSpecialization(doctor.getSpecialization());
+        response.setConsultationFee(doctor.getConsultationFee());
+        response.setStatus(doctor.getStatus());
+        response.setCreatedAt(doctor.getCreatedAt());
+
+        return response;
     }
 }
