@@ -1,9 +1,6 @@
 package com.example.smartqueue.dto;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,9 +16,13 @@ public class DoctorRequest {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Enter a valid email")
+    @Size(max = 150, message = "Email cannot exceed 150 characters")
     private String email;
 
-    @Size(max = 15, message  = "Phone number cannot exceed 15 characters")
+    @Pattern(
+            regexp = "^[6-9]\\d{9}$",
+            message = "Enter a valid 10-digit phone number"
+    )
     private String phone;
 
     @NotBlank(message = "Specialization is required")
