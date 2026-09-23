@@ -20,6 +20,12 @@ public class DoctorService {
 
     public Doctor createDoctor(DoctorRequest request) {
 
+        if (doctorRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException(
+                    "Doctor with this email already exists"
+            );
+        }
+
         Doctor doctor = new Doctor();
 
         doctor.setName(request.getName());
