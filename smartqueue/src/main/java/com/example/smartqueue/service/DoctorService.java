@@ -7,6 +7,7 @@ import com.example.smartqueue.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import com.example.smartqueue.exception.ResourceNotFoundException;
+import com.example.smartqueue.exception.BadRequestException;
 
 import java.time.LocalDateTime;
 
@@ -19,10 +20,10 @@ public class DoctorService {
         this.doctorRepository = doctorRepository;
     }
 
-    public Doctor createDoctor(DoctorRequest request) {
+    public DoctorResponseDTO createDoctor(DoctorRequest request) {
 
         if (doctorRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "Doctor with this email already exists"
             );
         }

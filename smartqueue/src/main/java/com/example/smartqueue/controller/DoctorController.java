@@ -2,7 +2,6 @@ package com.example.smartqueue.controller;
 
 import com.example.smartqueue.dto.DoctorRequest;
 import com.example.smartqueue.dto.DoctorResponseDTO;
-import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.service.DoctorService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -34,6 +33,7 @@ public class DoctorController {
         );
     }
 
+
     @GetMapping
     public ResponseEntity<List<DoctorResponseDTO>> getAllDoctors() {
 
@@ -52,3 +52,4 @@ public class DoctorController {
 
         return ResponseEntity.ok(doctor);
     }
+}
