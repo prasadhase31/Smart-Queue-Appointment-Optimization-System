@@ -77,4 +77,34 @@ public class DoctorService {
 
         return response;
     }
+    public DoctorResponseDTO updateDoctor(
+            Long id,
+            DoctorRequest request) {
+
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Doctor not found with id: " + id
+                        )
+                );
+
+        // Check whether email belongs to another doctor
+        if (!doctor.getEmail().equals(request.getEmail())
+                && doctorRepository.existsByEmail(request.getEmail())) {
+
+            throw new BadRequestException(
+                    "Doctor with this email already exists"
+            );
+        }
+
+        doctor.setName(request.getName());
+        doctor.setEmail(request.getEmail());
+        doctor.setPhone(request.getPhone());
+        doctor.setSpecialization(request.getSpecialization());
+        doctor.setConsultationFee(request.getConsultationFee());
+
+        Doctor updatedDoctor = doctorRepository.save(doctor);
+
+        return mapToResponseDTO(updatedDoctor);
+    }
 }
