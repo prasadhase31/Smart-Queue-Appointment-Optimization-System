@@ -5,6 +5,7 @@ import com.example.smartqueue.entity.Appointment;
 import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.entity.User;
+import com.example.smartqueue.exception.BadRequestException;
 import com.example.smartqueue.repository.AppointmentRepository;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
 import com.example.smartqueue.repository.DoctorRepository;
@@ -50,6 +51,12 @@ public class AppointmentService {
                 .orElseThrow(() ->
                         new RuntimeException("Doctor not found")
                 );
+
+        if (!"ACTIVE".equalsIgnoreCase(doctor.getStatus())) {
+            throw new BadRequestException(
+                    "Inactive doctor cannot accept new appointments"
+            );
+        }
 
         // Find Availability
         DoctorAvailability availability =
