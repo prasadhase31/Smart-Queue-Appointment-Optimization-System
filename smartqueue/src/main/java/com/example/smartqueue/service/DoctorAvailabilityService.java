@@ -1,12 +1,14 @@
 package com.example.smartqueue.service;
 
 import com.example.smartqueue.dto.AvailabilityResponseDTO;
+import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.entity.DoctorAvailability;
+import com.example.smartqueue.exception.ResourceNotFoundException;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
-import org.apache.coyote.BadRequestException;
+//import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import com.example.smartqueue.repository.DoctorRepository;
-
+import com.example.smartqueue.exception.BadRequestException;
 import java.util.List;
 
 @Service
