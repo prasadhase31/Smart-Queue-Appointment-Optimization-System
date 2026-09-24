@@ -6,6 +6,7 @@ import com.example.smartqueue.entity.Doctor;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.entity.User;
 import com.example.smartqueue.exception.BadRequestException;
+import com.example.smartqueue.exception.ResourceNotFoundException;
 import com.example.smartqueue.repository.AppointmentRepository;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
 import com.example.smartqueue.repository.DoctorRepository;
@@ -43,13 +44,13 @@ public class AppointmentService {
         // Find Patient
         User patient = userRepository.findById(request.getPatientId())
                 .orElseThrow(() ->
-                        new RuntimeException("Patient not found")
+                        new ResourceNotFoundException("Patient not found")
                 );
 
         // Find Doctor
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
                 .orElseThrow(() ->
-                        new RuntimeException("Doctor not found")
+                        new ResourceNotFoundException("Doctor not found")
                 );
 
         if (!"ACTIVE".equalsIgnoreCase(doctor.getStatus())) {
@@ -63,12 +64,12 @@ public class AppointmentService {
                 doctorAvailabilityRepository.findById(
                         request.getAvailabilityId()
                 ).orElseThrow(() ->
-                        new RuntimeException("Availability not found")
+                        new ResourceNotFoundException("Availability not found")
                 );
 
         // Doctor ↔ Availability validation
         if (!availability.getDoctor().getId().equals(doctor.getId())) {
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "This availability does not belong to this doctor"
             );
         }
@@ -77,7 +78,7 @@ public class AppointmentService {
         if (!request.getAppointmentDate()
                 .equals(availability.getAvailableDate())) {
 
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "Appointment date does not match doctor's availability date"
             );
         }
@@ -86,7 +87,7 @@ public class AppointmentService {
         if (request.getAppointmentTime().isBefore(availability.getStartTime())
                 || request.getAppointmentTime().isAfter(availability.getEndTime())) {
 
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "Appointment time is outside doctor's availability time"
             );
         }
@@ -101,7 +102,7 @@ public class AppointmentService {
                         );
 
         if (alreadyBooked) {
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "This doctor is already booked for this date and time"
             );
         }
