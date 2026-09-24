@@ -107,4 +107,14 @@ public class DoctorService {
 
         return mapToResponseDTO(updatedDoctor);
     }
+
+    public Doctor getDoctorEntityById(Long id) {
+
+        return doctorRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Doctor not found with id: " + id
+                        )
+                );
+    }
 }

@@ -3,6 +3,7 @@ package com.example.smartqueue.service;
 import com.example.smartqueue.dto.AvailabilityResponseDTO;
 import com.example.smartqueue.entity.DoctorAvailability;
 import com.example.smartqueue.repository.DoctorAvailabilityRepository;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import com.example.smartqueue.repository.DoctorRepository;
 
@@ -33,11 +34,20 @@ public class DoctorAvailabilityService {
     public AvailabilityResponseDTO createAvailability(
             DoctorAvailability availability) {
 
-        doctorRepository.findById(
+        Doctor doctor = doctorRepository.findById(
                 availability.getDoctor().getId()
         ).orElseThrow(() ->
-                new RuntimeException("Doctor not found")
+                new ResourceNotFoundException(
+                        "Doctor not found with id: "
+                                + availability.getDoctor().getId()
+                )
         );
+
+        if (!"ACTIVE".equalsIgnoreCase(doctor.getStatus())) {
+            throw new BadRequestException(
+                    "Inactive doctor cannot have new availability"
+            );
+        }
 
         if (availability.getAvailableDate()
                 .getDayOfWeek()
