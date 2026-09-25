@@ -59,3 +59,9 @@ DESCRIBE appointments;
 SELECT id, name, email, role FROM users;
 
 select * from appointments;
+DELETE FROM appointments
+WHERE id IN (4, 5, 6, 7, 8);
+
+UPDATE doctors
+SET status = 'ACTIVE'
+WHERE id = 1;

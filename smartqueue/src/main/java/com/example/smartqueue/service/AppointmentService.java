@@ -59,6 +59,21 @@ public class AppointmentService {
             );
         }
 
+        // Past date validation
+        if (request.getAppointmentDate().isBefore(java.time.LocalDate.now())) {
+            throw new BadRequestException(
+                    "Appointment date cannot be in the past"
+            );
+        }
+
+        if (request.getAppointmentDate().equals(java.time.LocalDate.now())
+                && request.getAppointmentTime().isBefore(java.time.LocalTime.now())) {
+
+            throw new BadRequestException(
+                    "Appointment time cannot be in the past"
+            );
+        }
+
         // Find Availability
         DoctorAvailability availability =
                 doctorAvailabilityRepository.findById(
