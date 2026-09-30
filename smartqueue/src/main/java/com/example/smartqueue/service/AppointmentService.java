@@ -153,69 +153,118 @@ public class AppointmentService {
     // Update Appointment
 
     // Update Appointment
+    // Update Appointment
     public AppointmentResponseDTO updateAppointment(
             Long id,
             AppointmentRequestDTO request) {
 
-        // Find existing appointment
+        // 1. Find existing appointment
         Appointment existingAppointment =
                 appointmentRepository.findById(id)
                         .orElseThrow(() ->
-                                new RuntimeException("Appointment not found"));
+                                new ResourceNotFoundException(
+                                        "Appointment not found with id: " + id
+                                )
+                        );
 
-        // Cancelled appointment cannot be updated
+        // 2. Cancelled appointment cannot be updated
         if ("CANCELLED".equals(existingAppointment.getStatus())) {
-            throw new RuntimeException(
+
+            throw new BadRequestException(
                     "Cancelled appointment cannot be updated"
             );
         }
 
-        // Find Patient
-        User patient = userRepository.findById(request.getPatientId())
-                .orElseThrow(() ->
-                        new RuntimeException("Patient not found")
-                );
+        // 3. Past date validation
+        if (request.getAppointmentDate()
+                .isBefore(java.time.LocalDate.now())) {
 
-        // Find Doctor
-        Doctor doctor = doctorRepository.findById(request.getDoctorId())
-                .orElseThrow(() ->
-                        new RuntimeException("Doctor not found")
-                );
+            throw new BadRequestException(
+                    "Appointment date cannot be in the past"
+            );
+        }
 
-        // Find Availability
+        // 4. Past time validation
+        if (request.getAppointmentDate()
+                .equals(java.time.LocalDate.now())
+                && request.getAppointmentTime()
+                .isBefore(java.time.LocalTime.now())) {
+
+            throw new BadRequestException(
+                    "Appointment time cannot be in the past"
+            );
+        }
+
+        // 5. Find patient
+        User patient =
+                userRepository.findById(request.getPatientId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Patient not found with id: "
+                                                + request.getPatientId()
+                                )
+                        );
+
+        // 6. Find doctor
+        Doctor doctor =
+                doctorRepository.findById(request.getDoctorId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Doctor not found with id: "
+                                                + request.getDoctorId()
+                                )
+                        );
+
+        // 7. Doctor must be ACTIVE
+        if (!"ACTIVE".equalsIgnoreCase(doctor.getStatus())) {
+
+            throw new BadRequestException(
+                    "Inactive doctor cannot accept appointments"
+            );
+        }
+
+        // 8. Find availability
         DoctorAvailability availability =
                 doctorAvailabilityRepository.findById(
-                        request.getAvailabilityId()
-                ).orElseThrow(() ->
-                        new RuntimeException("Availability not found")
-                );
+                                request.getAvailabilityId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Availability not found with id: "
+                                                + request.getAvailabilityId()
+                                )
+                        );
 
-        // Doctor ↔ Availability validation
-        if (!availability.getDoctor().getId().equals(doctor.getId())) {
-            throw new RuntimeException(
+        // 9. Doctor ↔ Availability validation
+        if (!availability.getDoctor().getId()
+                .equals(doctor.getId())) {
+
+            throw new BadRequestException(
                     "This availability does not belong to this doctor"
             );
         }
 
-        // Date validation
+        // 10. Date validation
         if (!request.getAppointmentDate()
                 .equals(availability.getAvailableDate())) {
 
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "Appointment date does not match doctor's availability date"
             );
         }
 
-        // Time validation
-        if (request.getAppointmentTime().isBefore(availability.getStartTime())
-                || request.getAppointmentTime().isAfter(availability.getEndTime())) {
+        // 11. Time validation
+        if (request.getAppointmentTime()
+                .isBefore(availability.getStartTime())
+                || request.getAppointmentTime()
+                .isAfter(availability.getEndTime())) {
 
-            throw new RuntimeException(
+            throw new BadRequestException(
                     "Appointment time is outside doctor's availability time"
             );
         }
 
-        // Duplicate booking validation
+        // 12. Duplicate booking validation
         boolean alreadyBooked =
                 appointmentRepository
                         .existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndIdNot(
@@ -226,12 +275,13 @@ public class AppointmentService {
                         );
 
         if (alreadyBooked) {
-            throw new RuntimeException(
+
+            throw new BadRequestException(
                     "This doctor is already booked for this date and time"
             );
         }
 
-        // Update appointment
+        // 13. Update appointment
         existingAppointment.setPatient(patient);
         existingAppointment.setDoctor(doctor);
         existingAppointment.setAvailability(availability);
@@ -245,121 +295,101 @@ public class AppointmentService {
                 request.getReason()
         );
 
-        // Keep existing status
-        // Status should be managed by confirm/cancel APIs
-        // existingAppointment.setStatus(...) is intentionally removed
-
+        // 14. Save
         Appointment updatedAppointment =
                 appointmentRepository.save(existingAppointment);
 
+        // 15. Return DTO
         return mapToResponseDTO(updatedAppointment);
     }
+    private AppointmentResponseDTO mapToResponseDTO(
+            Appointment appointment) {
 
-
-
-    // Cancel Appointment
-    public AppointmentResponseDTO cancelAppointment(Long id) {
-
-        Appointment appointment =
-                appointmentRepository.findById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException("Appointment not found"));
-
-        if ("CANCELLED".equals(appointment.getStatus())) {
-            throw new RuntimeException("Appointment is already cancelled");
-        }
-
-        appointment.setStatus("CANCELLED");
-
-        Appointment cancelledAppointment =
-                appointmentRepository.save(appointment);
-
-        return mapToResponseDTO(cancelledAppointment);
-    }
-
-    // Confirm Appointment
-    public AppointmentResponseDTO confirmAppointment(Long id) {
-
-        Appointment appointment =
-                appointmentRepository.findById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException("Appointment not found"));
-
-        if ("CANCELLED".equals(appointment.getStatus())) {
-            throw new RuntimeException(
-                    "Cancelled appointment cannot be confirmed"
-            );
-        }
-
-        if ("CONFIRMED".equals(appointment.getStatus())) {
-            throw new RuntimeException(
-                    "Appointment is already confirmed"
-            );
-        }
-
-        appointment.setStatus("CONFIRMED");Appointment confirmedAppointment =
-                appointmentRepository.save(appointment);
-
-        return mapToResponseDTO(confirmedAppointment);
-    }
-
-    // Delete Appointment
-    public void deleteAppointment(Long id) {
-
-        if (!appointmentRepository.existsById(id)) {
-            throw new RuntimeException("Appointment not found");
-        }
-
-        appointmentRepository.deleteById(id);
-    }
-    private AppointmentResponseDTO mapToResponseDTO(Appointment appointment) {
-
-        AppointmentResponseDTO response = new AppointmentResponseDTO();
+        AppointmentResponseDTO response =
+                new AppointmentResponseDTO();
 
         response.setId(appointment.getId());
-        response.setAppointmentDate(appointment.getAppointmentDate());
-        response.setAppointmentTime(appointment.getAppointmentTime());
-        response.setReason(appointment.getReason());
-        response.setStatus(appointment.getStatus());
+        response.setAppointmentDate(
+                appointment.getAppointmentDate()
+        );
+        response.setAppointmentTime(
+                appointment.getAppointmentTime()
+        );
+        response.setReason(
+                appointment.getReason()
+        );
+        response.setStatus(
+                appointment.getStatus()
+        );
 
-        // Patient
-        UserResponseDTO patient = new UserResponseDTO();
-        patient.setId(appointment.getPatient().getId());
-        patient.setName(appointment.getPatient().getName());
-        patient.setEmail(appointment.getPatient().getEmail());
-        patient.setPhone(appointment.getPatient().getPhone());
-        patient.setRole(appointment.getPatient().getRole());
+        // Patient DTO
+        if (appointment.getPatient() != null) {
 
-        response.setPatient(patient);
+            UserResponseDTO patient =
+                    new UserResponseDTO();
 
-        // Doctor
-        DoctorResponseDTO doctor = new DoctorResponseDTO();
-        doctor.setId(appointment.getDoctor().getId());
-        doctor.setName(appointment.getDoctor().getName());
-        doctor.setEmail(appointment.getDoctor().getEmail());
-        doctor.setPhone(appointment.getDoctor().getPhone());
-        doctor.setSpecialization(appointment.getDoctor().getSpecialization());
-        doctor.setConsultationFee(appointment.getDoctor().getConsultationFee());
-        doctor.setStatus(appointment.getDoctor().getStatus());
-        doctor.setCreatedAt(appointment.getDoctor().getCreatedAt());
+            patient.setId(appointment.getPatient().getId());
+            patient.setName(appointment.getPatient().getName());
+            patient.setEmail(appointment.getPatient().getEmail());
+            patient.setPhone(appointment.getPatient().getPhone());
+            patient.setRole(appointment.getPatient().getRole());
 
-        response.setDoctor(doctor);
+            response.setPatient(patient);
+        }
 
-        // Availability
-        AvailabilityResponseDTO availability = new AvailabilityResponseDTO();
-        availability.setId(appointment.getAvailability().getId());
-        availability.setAvailableDate(
-                appointment.getAvailability().getAvailableDate());
-        availability.setDayOfWeek(
-                appointment.getAvailability().getDayOfWeek());
-        availability.setStartTime(
-                appointment.getAvailability().getStartTime());
-        availability.setEndTime(
-                appointment.getAvailability().getEndTime());
-        availability.setIsAvailable(
-                appointment.getAvailability().getIsAvailable());
+        // Doctor DTO
+        if (appointment.getDoctor() != null) {
 
-        response.setAvailability(availability);
+            DoctorResponseDTO doctor =
+                    new DoctorResponseDTO();
+
+            doctor.setId(appointment.getDoctor().getId());
+            doctor.setName(appointment.getDoctor().getName());
+            doctor.setEmail(appointment.getDoctor().getEmail());
+            doctor.setPhone(appointment.getDoctor().getPhone());
+            doctor.setSpecialization(
+                    appointment.getDoctor().getSpecialization()
+            );
+            doctor.setConsultationFee(
+                    appointment.getDoctor().getConsultationFee()
+            );
+            doctor.setStatus(
+                    appointment.getDoctor().getStatus()
+            );
+            doctor.setCreatedAt(
+                    appointment.getDoctor().getCreatedAt()
+            );
+
+            response.setDoctor(doctor);
+        }
+
+        // Availability DTO
+        if (appointment.getAvailability() != null) {
+
+            AvailabilityResponseDTO availability =
+                    new AvailabilityResponseDTO();
+
+            availability.setId(
+                    appointment.getAvailability().getId()
+            );
+            availability.setAvailableDate(
+                    appointment.getAvailability().getAvailableDate()
+            );
+            availability.setDayOfWeek(
+                    appointment.getAvailability().getDayOfWeek()
+            );
+            availability.setStartTime(
+                    appointment.getAvailability().getStartTime()
+            );
+            availability.setEndTime(
+                    appointment.getAvailability().getEndTime()
+            );
+            availability.setIsAvailable(
+                    appointment.getAvailability().getIsAvailable()
+            );
+
+            response.setAvailability(availability);
+        }
 
         return response;
     }
