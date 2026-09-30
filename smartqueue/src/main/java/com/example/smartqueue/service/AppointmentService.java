@@ -302,6 +302,84 @@ public class AppointmentService {
         // 15. Return DTO
         return mapToResponseDTO(updatedAppointment);
     }
+
+    // Cancel Appointment
+    public AppointmentResponseDTO cancelAppointment(Long id) {
+
+        Appointment appointment =
+                appointmentRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Appointment not found with id: " + id
+                                )
+                        );
+
+        // Check already cancelled
+        if ("CANCELLED".equals(appointment.getStatus())) {
+
+            throw new BadRequestException(
+                    "Appointment is already cancelled"
+            );
+        }
+
+        appointment.setStatus("CANCELLED");
+
+        Appointment cancelledAppointment =
+                appointmentRepository.save(appointment);
+
+        return mapToResponseDTO(cancelledAppointment);
+    }
+
+
+    // Confirm Appointment
+    public AppointmentResponseDTO confirmAppointment(Long id) {
+
+        Appointment appointment =
+                appointmentRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Appointment not found with id: " + id
+                                )
+                        );
+
+        // Cancelled appointment cannot be confirmed
+        if ("CANCELLED".equals(appointment.getStatus())) {
+
+            throw new BadRequestException(
+                    "Cancelled appointment cannot be confirmed"
+            );
+        }
+
+        // Already confirmed
+        if ("CONFIRMED".equals(appointment.getStatus())) {
+
+            throw new BadRequestException(
+                    "Appointment is already confirmed"
+            );
+        }
+
+        appointment.setStatus("CONFIRMED");
+
+        Appointment confirmedAppointment =
+                appointmentRepository.save(appointment);
+
+        return mapToResponseDTO(confirmedAppointment);
+    }
+
+
+    // Delete Appointment
+    public void deleteAppointment(Long id) {
+
+        if (!appointmentRepository.existsById(id)) {
+
+            throw new ResourceNotFoundException(
+                    "Appointment not found with id: " + id
+            );
+        }
+
+        appointmentRepository.deleteById(id);
+    }
+
     private AppointmentResponseDTO mapToResponseDTO(
             Appointment appointment) {
 
