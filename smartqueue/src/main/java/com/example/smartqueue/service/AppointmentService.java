@@ -151,9 +151,6 @@ public class AppointmentService {
     }
 
     // Update Appointment
-
-    // Update Appointment
-    // Update Appointment
     public AppointmentResponseDTO updateAppointment(
             Long id,
             AppointmentRequestDTO request) {
