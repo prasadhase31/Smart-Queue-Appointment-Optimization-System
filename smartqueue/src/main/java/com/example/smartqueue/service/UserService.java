@@ -4,6 +4,7 @@ import com.example.smartqueue.dto.UserRequest;
 import com.example.smartqueue.entity.User;
 import com.example.smartqueue.exception.ResourceNotFoundException;
 import com.example.smartqueue.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,10 +15,18 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
 
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
     public User createUser(UserRequest request) {
 
         User user = new User();
