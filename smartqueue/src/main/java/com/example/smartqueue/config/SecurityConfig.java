@@ -1,5 +1,6 @@
 package com.example.smartqueue.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,7 +23,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -31,30 +31,47 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
-                // Disable CSRF because we are using REST API
+
+                // REST API - CSRF disabled
                 .csrf(csrf -> csrf.disable())
 
-                // JWT based authentication
+                // Disable default authentication methods
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(formLogin -> formLogin.disable())
+
+                // JWT is stateless
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // Authorization rules
+                // Authorization
                 .authorizeHttpRequests(auth -> auth
 
-                        // Public APIs
+                        // Public endpoints
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/users"
                         ).permitAll()
 
-                        // Everything else requires authentication
+                        // Other endpoints require authentication
                         .anyRequest().authenticated()
                 )
 
-                // Add JWT filter before UsernamePasswordAuthenticationFilter
+                // Return 401 instead of 403 when user is NOT authenticated
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(
+                                (request, response, authException) -> {
+                                    response.sendError(
+                                            HttpServletResponse.SC_UNAUTHORIZED,
+                                            "Unauthorized"
+                                    );
+                                }
+                        )
+                )
+
+                // JWT filter
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
