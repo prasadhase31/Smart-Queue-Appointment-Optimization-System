@@ -70,4 +70,15 @@ public class UserService {
 
         userRepository.deleteById(id);
     }
+
+    public void updatePassword(String email, String newPassword) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
+    }
 }

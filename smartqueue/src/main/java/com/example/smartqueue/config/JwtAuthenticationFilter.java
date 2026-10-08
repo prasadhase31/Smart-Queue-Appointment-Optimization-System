@@ -51,6 +51,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (jwtService.isTokenValid(token)) {
 
             // Extract email from token
+            String email = jwtService.extractEmail(token);
+
+            // Extract role from token
             String role = jwtService.extractRole(token);
 
             UsernamePasswordAuthenticationToken authentication =
