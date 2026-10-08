@@ -50,4 +50,14 @@ public class UserController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/password")
+    public ResponseEntity<String> updatePassword(
+            @RequestParam String email,
+            @RequestParam String password) {
+
+        userService.updatePassword(email, password);
+
+        return ResponseEntity.ok("Password updated successfully");
+    }
 }
