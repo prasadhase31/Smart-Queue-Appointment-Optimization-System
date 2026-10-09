@@ -51,18 +51,21 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token) {
-
         try {
             Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token);
 
+            System.out.println("JWT VALID");
             return true;
 
         } catch (Exception e) {
+            System.out.println("JWT INVALID: " + e.getClass().getSimpleName());
+            System.out.println("Reason: " + e.getMessage());
             return false;
         }
+
     }
 
     public String extractRole(String token) {

@@ -65,3 +65,22 @@ WHERE id IN (4, 5, 6, 7, 8);
 UPDATE doctors
 SET status = 'ACTIVE'
 WHERE id = 1;
+
+SELECT id, name, email, password, role
+FROM users
+WHERE email = 'prasad@gmail.com';
+
+UPDATE users
+SET role = 'ADMIN'
+WHERE email = 'prasad@gmail.com';
+
+SELECT id, name, email, password, role
+FROM users
+WHERE email = 'prasad@gmail.com';
+
+DELETE FROM users
+WHERE email = 'prasad@gmail.com';
+
+SELECT id, name, email, password, role
+FROM users
+WHERE email = 'sneha@gmail.com';

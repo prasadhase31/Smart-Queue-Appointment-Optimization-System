@@ -46,13 +46,15 @@ public class SecurityConfig {
                         )
                 )
 
+
                 // Authorization
                 .authorizeHttpRequests(auth -> auth
 
                         // Public endpoints
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/users"
+                                "/api/users",
+                                "/api/users/password"
                         ).permitAll()
 
                         .requestMatchers("/api/admin/**")
@@ -63,15 +65,21 @@ public class SecurityConfig {
                 )
 
                 // Return 401 instead of 403 when user is NOT authenticated
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(
-                                (request, response, authException) -> {
-                                    response.sendError(
-                                            HttpServletResponse.SC_UNAUTHORIZED,
-                                            "Unauthorized"
-                                    );
-                                }
-                        )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write(
+                                    "{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}"
+                            );
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write(
+                                    "{\"error\":\"Forbidden\",\"message\":\"Access denied\"}"
+                            );
+                        })
                 )
 
                 // JWT filter
